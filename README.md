@@ -1,22 +1,19 @@
-# Lab-07
+# Lab-08
 
-Project Name
+##SQL
 
-**Author**: Nadya Ilinskaya & Eric Huang
-**Version**: 1.0.3
+**Author**: Nadya Ilinskaya & Sarah Fisher
+**Version**: 3.1.0
 
 ## Overview
 Stand-alone back end which will interact with a static front end. App requests data from a total of six third-party APIs, and sending the data to the client to be displayed in the browser. 
-In labs 8 and 9, you will be persisting data in a SQL database.
+The app persisting data in a SQL database.
 
 
 ## Architecture
-We will use constructor functions to create output objects that follow the same patern. These constructor functions take in a user's query request and display data that gets recieved from the JSON files.
-## Change Log
+We will use constructor functions to create output objects that follow the same patern. These constructor functions take in a user's query request and display data that gets recieved from the SQL database or API.
 
-
-
-# Feature 1 -  Locations with API
+# Feature 1 -  Cofigure Postgres
 
 Estimate of time needed to complete: 1 h
 
@@ -26,7 +23,7 @@ Finish time: 11:00
 
 Actual time needed to complete: 
 
-# Feature 2 -  Weather with API
+# Feature 2 -  Check DB for Location
 
 Estimate of time needed to complete: 1 h
 
@@ -36,7 +33,7 @@ Finish time: 12:00
 
 Actual time needed to complete: 
 
-# Feature 2 -  EventBrite with API
+# Feature 3 -  Replicate local DB to Heroku
 
 Estimate of time needed to complete: 1 h
 
