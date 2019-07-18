@@ -247,7 +247,7 @@ Event.fetch = function(location) {
         const summary = new Event(ev);
         summary.save(location.id);
         return summary;
-      });
+      }).slice(0, 5);
       return eventEntries;
     });
 };
