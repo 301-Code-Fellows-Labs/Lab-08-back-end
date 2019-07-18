@@ -1,5 +1,6 @@
 DROP TABLE IF EXISTS weathers;
 DROP TABLE IF EXISTS locations;
+DROP TABLE IF EXISTS events;
 
 CREATE TABLE locations ( 
     id SERIAL PRIMARY KEY, 
@@ -13,6 +14,15 @@ CREATE TABLE weathers (
     id SERIAL PRIMARY KEY, 
     forecast VARCHAR(255), 
     time VARCHAR(255), 
+    location_id INTEGER NOT NULL,
+    FOREIGN KEY (location_id) REFERENCES locations (id)
+  );
+
+CREATE TABLE events ( 
+    id SERIAL PRIMARY KEY, 
+    link VARCHAR(255), 
+    event_name VARCHAR(255), 
+    summary TEXT, 
     location_id INTEGER NOT NULL,
     FOREIGN KEY (location_id) REFERENCES locations (id)
   );

@@ -158,10 +158,10 @@ Weather.lookup = function(handler) {
   client.query(SQL, [handler.location.id])
     .then(result => {
       if(result.rowCount > 0) {
-        console.log('Got data from SQL');
+        console.log('Got weather data from SQL');
         handler.cacheHit(result);
       } else {
-        console.log('Got data from API');
+        console.log('Got weather data from API');
         handler.cacheMiss();
       }
     })
@@ -183,28 +183,74 @@ Weather.fetch = function(location) {
     });
 };
 
-function getEvents(request, response) {
-  const url = `https://www.eventbriteapi.com/v3/events/search?location.latitude=${request.query.data.latitude}&location.longitude=${request.query.data.longitude}&token=${process.env.EVENTBRITE_API_KEY}`
-  return superagent.get(url)
+// EVENTS 
 
-    .then(
-      res => {  
-        const eventEntries = res.body.events.map(ev => {
-          return new Event(ev);     
-        }).slice(0, 2);
-        response.send(eventEntries);
-      })
-    .catch(error => {
-      response.send(error);
-    }); 
+// Route Handler
+function getEvents(request, response) {
+
+  const handler = {
+
+    location: request.query.data,
+
+    cacheHit: function(result) {
+      response.send(result.rows);
+    },
+
+    cacheMiss: function() {
+      Event.fetch(request.query.data)
+        .then( results => response.send(results) )
+        .catch( console.error );
+    },
+  };
+
+  Event.lookup(handler);
 }
 
+// Events Constructor/Normalizer
 function Event(res) {
   this.link = res.url;
   this.name = res.name.text;
   this.event_date = res.start.local;
   this.summary = res.description.text;
 }
+
+// Instance Method: Save a location to the DB
+Event.prototype.save = function(id) {
+  const SQL = `INSERT INTO events (link, event_name, sammary,location_id) VALUES ($1, $2, $3, $4);`;
+  const values = Object.values(this);
+  values.push(id);
+  client.query(SQL, values);
+};
+
+// Static Method: Lookup a location in the DB and invoke the proper callback methods based on what you find
+Event.lookup = function(handler) {
+  const SQL = `SELECT * FROM events WHERE location_id=$1;`;
+  client.query(SQL, [handler.location.id])
+    .then(result => {
+      if(result.rowCount > 0) {
+        console.log('Got event data from SQL');
+        handler.cacheHit(result);
+      } else {
+        console.log('Got event data from API');
+        handler.cacheMiss();
+      }
+    })
+    .catch(error => handleError(error));
+};
+
+// Static Method: Fetch a location from the weather API
+Event.fetch = function(location) {
+  const url = `https://www.eventbriteapi.com/v3/events/search?location.latitude=${location.latitude}&location.longitude=${location.longitude}&token=${process.env.EVENTBRITE_API_KEY}` 
+  return superagent.get(url)
+    .then(result => {
+      const eventEntries = result.body.events.map(ev => {
+        const summary = new Event(ev);
+        summary.save(location.id);
+        return summary;
+      });
+      return eventEntries;
+    });
+};
 
 // Make sure the server is listening for requests
 app.listen(PORT, () => console.log(`App is up on ${PORT}`));
